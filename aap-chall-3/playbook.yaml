@@ -22,7 +22,7 @@
     - name: Mount the partition on /extdrive
       mount:
         path: /extdrive
-        src: /dev/nvme1n1
+        src: /dev/nvme1n1p1
         fstype: xfs
         state: mounted
         opts: defaults
@@ -30,7 +30,7 @@
     - name: Set partition to be automounted
       mount:
         path: /extdrive
-        src: /dev/nvme1n1
+        src: /dev/nvme1n1p1
         fstype: xfs
         state: present
         opts: defaults
