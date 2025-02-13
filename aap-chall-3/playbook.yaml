@@ -1,5 +1,6 @@
 ---
 - name: Set up 1GB partition with XFS and mount it on /extdrive
+  hosts: all
   become: yes
   tasks:
     - name: Partition the disk /dev/nvme1n1 to create a 1GB partition

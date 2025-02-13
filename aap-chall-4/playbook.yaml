@@ -1,5 +1,6 @@
 ---
 - name: Setup NTP server, Cockpit service, and scheduled task
+  hosts: all
   become: yes
   tasks:
 
