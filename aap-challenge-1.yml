@@ -1,0 +1,67 @@
+---
+  - name: Create users and groups on RHEL
+    hosts: all
+    become: yes
+    tasks:
+      - name: Create multiple users with passwords and SSH keys
+        user:
+          name: "{{ item.name }}"
+          state: present
+          shell: /bin/bash
+          create_home: yes
+          password: "{{ '@#FD12' | password_hash('sha512') }}"
+        loop:
+          - { name: Annabelle }
+          - { name: Bob }
+          - { name: Carl }
+          - { name: Dyson }
+          - { name: Evert }
+          - { name: Frank }
+          - { name: Gerry }
+          - { name: Harold }
+          - { name: Isabella }
+          - { name: Jameson }
+  
+      - name: Ensure groups exist
+        group:
+          name: "{{ item }}"
+          state: present
+        loop:
+          - sales
+          - support
+          - service
+          - IT
+  
+      - name: Assign users to groups
+        user:
+          name: "{{ item.user }}"
+          groups: "{{ item.group }}"
+          append: yes
+        loop:
+          - { user: Frank, group: sales }
+          - { user: Annabelle, group: sales }
+          - { user: Carl, group: support }
+          - { user: Dyson, group: support }
+          - { user: Gerry, group: support }
+          - { user: Jameson, group: service }
+          - { user: Isabella, group: service }
+          - { user: Harold, group: IT }
+          - { user: Evert, group: IT }
+          - { user: Bob, group: IT }
+  
+      - name: Add SSH keys for users
+        authorized_key:
+          user: "{{ item }}"
+          key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFN90Xtfjxqs2ZpO0VqR1jr92mJiTx3IaEl/F+LiOZJK"
+          state: present
+        loop:
+          - Annabelle
+          - Bob
+          - Carl
+          - Dyson
+          - Evert
+          - Frank
+          - Gerry
+          - Harold
+          - Isabella
+          - Jameson
