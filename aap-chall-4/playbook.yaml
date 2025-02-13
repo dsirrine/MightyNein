@@ -17,7 +17,7 @@
     # Step 2: Ensure Cockpit service is running and enabled
     - name: Ensure cockpit service is running and enabled
       service:
-        name: cockpit
+        name: cockpit.socket
         state: started
         enabled: yes
 
@@ -26,7 +26,7 @@
       cron:
         name: "runningaway"
         minute: "*/5"  # Executes every 5 minutes (adjust as needed)
-        job: "/bin/systemctl is-active --quiet cockpit && echo 'Cockpit service is running' || echo 'Cockpit service is not running' >> /var/log/automation.log"
+        job: "/bin/systemctl is-active --quiet cockpit.socket && echo 'Cockpit service is running' || echo 'Cockpit service is not running' >> /var/log/automation.log"
         state: present
 
   handlers:
