@@ -1,0 +1,48 @@
+---
+- name: Set up 1GB partition with XFS and mount it on /extdrive
+  hosts: rhel_servers
+  become: yes
+  tasks:
+    - name: Partition the disk /dev/nvme1n1 to create a 1GB partition
+      command:
+        cmd: "parted /dev/nvme1n1 mklabel gpt mkpart primary xfs 0% 1GB"
+      when: ansible_facts['devices']['/dev/nvme1n1'] is defined
+
+    - name: Create filesystem with xfs on the partition
+      filesystem:
+        fstype: xfs
+        dev: /dev/nvme1n1p1
+      when: ansible_facts['devices']['/dev/nvme1n1'] is defined
+
+    - name: Create mount point /extdrive
+      file:
+        path: /extdrive
+        state: directory
+
+    - name: Mount the partition on /extdrive
+      mount:
+        path: /extdrive
+        src: /dev/nvme1n1p1
+        fstype: xfs
+        state: mounted
+        opts: defaults
+
+    - name: Set partition to be automounted
+      mount:
+        path: /extdrive
+        src: /dev/nvme1n1p1
+        fstype: xfs
+        state: present
+        opts: defaults
+        fstab: yes
+
+    - name: Set permissions for the "IT" group on /extdrive
+      file:
+        path: /extdrive
+        group: IT
+        mode: '0770'  # Read, write, and execute permissions for owner and group only
+
+    - name: Ensure "IT" group exists
+      group:
+        name: IT
+        state: present

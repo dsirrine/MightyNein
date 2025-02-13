@@ -1,0 +1,36 @@
+---
+- name: Setup NTP server, Cockpit service, and scheduled task
+  hosts: rhel_servers
+  become: yes
+  tasks:
+
+    # Step 1: Configure NTP server
+    - name: Configure NTP server to use 3.north-america.pool.ntp.org
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^server'
+        line: 'server 3.north-america.pool.ntp.org iburst'
+        state: present
+      notify:
+        - restart chronyd
+
+    # Step 2: Ensure Cockpit service is running and enabled
+    - name: Ensure cockpit service is running and enabled
+      service:
+        name: cockpit
+        state: started
+        enabled: yes
+
+    # Step 3: Create a cron job to log the state of the cockpit service to automation.log
+    - name: Setup a scheduled task to log cockpit service state
+      cron:
+        name: "runningaway"
+        minute: "*/5"  # Executes every 5 minutes (adjust as needed)
+        job: "/bin/systemctl is-active --quiet cockpit && echo 'Cockpit service is running' || echo 'Cockpit service is not running' >> /var/log/automation.log"
+        state: present
+
+  handlers:
+    - name: restart chronyd
+      service:
+        name: chronyd
+        state: restarted
