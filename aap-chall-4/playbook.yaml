@@ -1,6 +1,5 @@
 ---
 - name: Setup NTP server, Cockpit service, and scheduled task
-  hosts: rhel_servers
   become: yes
   tasks:
 
